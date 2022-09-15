@@ -1,22 +1,17 @@
 [
 	{
-		"OrganizationName": "Organization One",
-		"OrganizationId": "Org1",
-		"Description": "This is organization 1"
+		"OrganizationName": "Dance School",
+		"OrganizationId": "Dance",
+		"Description": "This is Dance School"
 	},
 	{
-		"OrganizationName": "Organization Two",
-		"OrganizationId": "Org2",
-		"Description": "This is organization 2"
+		"OrganizationName": "Music School",
+		"OrganizationId": "Music",
+		"Description": "This is Music School"
     },
     {
-		"OrganizationName": "Organization Three",
-		"OrganizationId": "Org3",
-		"Description": "This is organization 3" 
-	},
-	{
-		"OrganizationName": "Organization Four",
-		"OrganizationId": "Org4",
-		"Description": "This is organization 4"
+		"OrganizationName": "Art School",
+		"OrganizationId": "Art",
+		"Description": "This is Art school" 
 	}
 ]

@@ -1,8 +1,8 @@
 [
     {
         "GroupId": 1,
-        "GroupName": "United Front",
-        "OrganizationName": "Organization One",
+        "GroupName": "Jazz",
+        "OrganizationName": "Dance School",
         "SponsorName": "Natalie Rachelle",
         "SponsorPhone": "555-000-0000",
         "SponsorEmail": "nat214@gmail.com",
@@ -30,8 +30,8 @@
     },
     {
         "GroupId": 2,
-        "GroupName": "Warriors",
-        "OrganizationName": "Organization Two",
+        "GroupName": "Tap Dance",
+        "OrganizationName": "Dance School",
         "SponsorName": "Brittany Ray",
         "SponsorPhone": "555-000-0004",
         "SponsorEmail": "brit805@aol.com",
@@ -53,8 +53,25 @@
     },
     {
         "GroupId": 3,
-        "GroupName": "Strategy One",
-        "OrganizationName": "Organization Three",
+        "GroupName": "Folk Dance",
+        "OrganizationName": "Dance School",
+        "SponsorName": "Zachary Westly",
+        "SponsorPhone": "555-000-0012",
+        "SponsorEmail": "zwest90@gmail.com",
+        "MaxGroupSize": 7,
+        "Members": [
+            {
+                "MemberId": 3,
+                "MemberEmail": "ian_the_great@gmail.com",
+                "MemberName": "Ian Auston",
+                "MemberPhone": "555-000-0025"
+            }
+        ]
+    },
+    {
+        "GroupId": 3,
+        "GroupName": "Folk Art",
+        "OrganizationName": "Art School",
         "SponsorName": "Zachary Westly",
         "SponsorPhone": "555-000-0012",
         "SponsorEmail": "zwest90@gmail.com",
@@ -68,4 +85,5 @@
             }
         ]
     }
+
 ]
