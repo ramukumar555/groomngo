@@ -7,6 +7,8 @@
         "SponsorPhone": "555-000-0000",
         "SponsorEmail": "nat214@gmail.com",
         "MaxGroupSize": 7,
+        "Image": "/images/grp1.jpg",
+        "Description": "Sample Data",
         "Members": [
             {
                 "MemberId": 2,
@@ -36,6 +38,8 @@
         "SponsorPhone": "555-000-0004",
         "SponsorEmail": "brit805@aol.com",
         "MaxGroupSize": 7,
+        "Image": "/images/grp1.jpg",
+        "Description": "Sample Data",
         "Members": [
             {
                 "MemberId": 1,
@@ -59,6 +63,8 @@
         "SponsorPhone": "555-000-0012",
         "SponsorEmail": "zwest90@gmail.com",
         "MaxGroupSize": 7,
+        "Image": "/images/grp1.jpg",
+        "Description": "Sample Data",
         "Members": [
             {
                 "MemberId": 3,
@@ -69,13 +75,15 @@
         ]
     },
     {
-        "GroupId": 3,
+        "GroupId": 4,
         "GroupName": "Folk Art",
         "OrganizationName": "Art School",
         "SponsorName": "Zachary Westly",
         "SponsorPhone": "555-000-0012",
         "SponsorEmail": "zwest90@gmail.com",
         "MaxGroupSize": 7,
+        "Image": "/images/grp1.jpg",
+        "Description": "Sample Data",
         "Members": [
             {
                 "MemberId": 3,
