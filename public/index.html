@@ -78,6 +78,7 @@
             
             
         }
+
         function sendReqToServer(url,type,formID){
             let form = $(formID);
             let isaaray = Array.isArray(form);
@@ -106,7 +107,7 @@
                     "<div class=\"btn-group btn-group-justified w-100\">"+
                         "<button type=\"button\" class=\"btn btn-sm btn-primary\" data-toggle=\"modal\" data-target=\"#groupDetails"+group.GroupId+"\" data-groupid='"+group.GroupId+"'>Details</button>"+
                         "<button type=\"button\" class=\"btn btn-sm btn-primary\" data-toggle=\"modal\" data-target=\"#groupAddMe\" data-groupid='"+group.GroupId+"'>Add Me</button>"+
-                        "<button type=\"button\" class=\"btn btn-sm btn-primary\" data-toggle=\"modal\" data-target=\"#groupMemberList\" data-groupid='"+group.GroupId+"'>Members List</button>"+
+                        "<button type=\"button\" class=\"btn btn-sm btn-primary\" data-toggle=\"modal\" data-target=\"#groupMemberList"+group.GroupId+"\" data-groupid='"+group.GroupId+"'>Members List</button>"+
                     "</div>"+
                     "</div>"+
                 "</div>"+
@@ -209,7 +210,64 @@
                 
                 $('#groups #groupsRow').append(goupDetailsEditContent);
         }
-        
+       
+        function createMemberListModal(group){
+            //Model to Edit 
+            var members = group.Members;
+            var membersCount = Object.keys(members).length;
+            var memberalistContent = "<div class=\"modal fade\" id=\"groupMemberList"+group.GroupId+"\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"groupDetailsLabel\" aria-hidden=\"true\">"+
+                "<div class=\"modal-dialog modal-lg\" role=\"document\">"+
+                  "<div class=\"modal-content\">"+
+                    "<div class=\"modal-header\">"+
+                      "<h5 class=\"modal-title\" id=\"groupDetailsLabel\">View "+group.GroupName+"'s Members</h5>"+
+                      "<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\">"+
+                        "<span aria-hidden=\"true\">&times;</span>"+
+                      "</button>"+
+                    "</div>"+
+                    "<div class=\"modal-body\"><div class=\"table-responsive\">"+
+                        "<table class=\"table table-striped\">"+
+                            "<thead class='thead-dark'>"+
+                                "<tr>"+
+                                    "<th scope=\"col\">MemberId</th>"+
+                                    "<th scope=\col\">MemberEmail</th>"+
+                                    "<th scope=\"col\">MemberName</th>"+
+                                    "<th scope=\"col\">MemberPhone</th>"+
+                                    "<th scope=\"col\">#</th>"+
+                                "</tr>"+
+                              "</thead>"+
+                              "<tbody>";
+                                            
+            if(membersCount > 0){                                
+                $.each(members, function(index, member){
+                    var url = "/api/groups/"+group.GroupId+"/members/"+member.MemberId;
+                    memberalistContent  = memberalistContent+ "<tr>"+
+                                        "<th scope=\"row\">"+member.MemberId+"</th>"+
+                                        "<td>"+member.MemberEmail+"</td>"+
+                                        "<td>"+member.MemberName+"</td>"+
+                                        "<td>"+member.MemberPhone+"</td>"+
+                                        "<td><a class=\"link-primary\">Edit</a>  ||  <a class=\"link-danger\"  onClick=\"sendReqToServer('"+url+"','DELETE',null);\">Delete</a></td>"+
+                                    "</tr>";
+                });
+            } else {
+                memberalistContent  = memberalistContent+ "<tr>"+
+                    "<th scope=\"row\" colspan='5'>No members </th>"+
+                "</tr>";
+            }
+
+            memberalistContent  = memberalistContent+"</tbody></table>"+
+                      "</div>";
+                          
+            
+            memberalistContent  = memberalistContent+ "</div>"+
+                    "<div class=\"modal-footer\">"+
+                      "<button type=\"button\" class=\"btn btn-secondary \" data-dismiss=\"modal\">Close</button>"+                      
+                    "</div>"+
+                  "</div>"+
+                "</div>"+
+              "</div>";
+            
+            $('#groups #groupsRow').append(memberalistContent);
+    }
         function displayGroupCard(groups) {
             $.each(groups, function(index, group) {
                 
@@ -217,6 +275,7 @@
                 createGroupDetailsModal(group);
                 createGroupDelateModal(group);
                 createGroupEditModal(group);  
+                createMemberListModal(group)
             });       
         }
     </script>
