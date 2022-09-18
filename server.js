@@ -240,7 +240,7 @@ app.put("/api/groups/:id", urlencodedParser, function (req, res) {
 
     // assemble group information so we can validate it
     let group = {
-        GroupId: groupId,
+        GroupId: Number(req.body.GroupId),
         GroupName: req.body.GroupName,
         OrganizationName: req.body.OrganizationName,
         SponsorName: req.body.SponsorName,
@@ -248,6 +248,8 @@ app.put("/api/groups/:id", urlencodedParser, function (req, res) {
         SponsorEmail: req.body.SponsorEmail,
         MaxGroupSize: Number(req.body.MaxGroupSize),
     };
+
+    console.log("Group -------->" + JSON.stringify(group));
 
     console.log("Performing validation...");
     let errorCode = isValidGroup(group);
@@ -260,6 +262,7 @@ app.put("/api/groups/:id", urlencodedParser, function (req, res) {
     let data = fs.readFileSync(__dirname + "/data/groups.json", "utf8");
     data = JSON.parse(data);
 
+    console.log(JSON.stringify(data));
     // find the group
     let match = data.find(element => element.GroupId == group.GroupId);
     if (!match) {
