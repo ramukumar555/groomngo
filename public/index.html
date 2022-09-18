@@ -283,8 +283,10 @@
                                         "<td>"+member.MemberEmail+"</td>"+
                                         "<td>"+member.MemberName+"</td>"+
                                         "<td>"+member.MemberPhone+"</td>"+
-                                        "<td><a class=\"link-primary\">Edit</a>  ||  <a class=\"link-danger\"  onClick=\"sendReqToServer('"+url+"','DELETE',null);\">Delete</a></td>"+
+                                        "<td>"+
+                                            "<a class=\"link-primary\" data-toggle=\"modal\" data-target=\"#memberDetailsEdit-"+group.GroupId+"-"+member.MemberId+"\">Edit</a>  ||  <a class=\"link-danger\"  onClick=\"sendReqToServer('"+url+"','DELETE',null);\">Delete</a></td>"+
                                     "</tr>";
+                    createEditMemberModal(group,member);
                 });
             } else {
                 memberalistContent  = memberalistContent+ "<tr>"+
@@ -306,7 +308,44 @@
             
             $('#groups #groupsRow').append(memberalistContent);
     }
-     
+  
+        function createEditMemberModal(group,member){
+            //Model to Edit 
+            var memberDetailsEditContent = "<div class=\"modal fade\" id=\"memberDetailsEdit-"+group.GroupId+"-"+member.MemberId+"\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"groupDetailsLabel\" aria-hidden=\"true\">"+
+                "<div class=\"modal-dialog\" role=\"document\">"+
+                "<div class=\"modal-content\">"+
+                    "<div class=\"modal-header\">"+
+                    "<h5 class=\"modal-title\" id=\"groupDetailsLabel\">Edit "+member.MemberName+" in Group "+group.GroupName+"</h5>"+
+                    "<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\">"+
+                        "<span aria-hidden=\"true\">&times;</span>"+
+                    "</button>"+
+                    "</div>"+
+                    "<div class=\"modal-body\"><form id=\"editGroupForm-"+group.GroupId+"-"+member.MemberId+"\" class=\form-group container\">";
+            $.each(member, function(key, value){
+                if(key !== "MemberId"   ){  
+                    memberDetailsEditContent  = memberDetailsEditContent+ "<div class=\"form-group row\">"+
+                    "<label for=\"staticEmail\" class=\"col-sm col-form-label\">"+key+"</label>"+                        
+                    "<div class=\"col-sm\">"+
+                    "<input type=\"text\" class=\"form-control\" id=\""+key+"\" name=\""+key+"\" value=\""+value+"\">"+
+                    "</div>"+
+                    "</div>";
+                }
+                    
+            });                            
+            let url = "/api/groups/"+group.GroupId+"/members/"+member.MemberId;
+            memberDetailsEditContent  = memberDetailsEditContent+ "</form></div>"+
+                    "<div class=\"modal-footer\">"+
+                    "<button type=\"button\" class=\"btn btn-secondary \" data-dismiss=\"modal\">Close</button>"+
+                    "<button type=\"button\" class=\"btn btn-primary\" onClick=\"sendReqToServer('"+url+"','PUT','#editGroupForm-"+group.GroupId+"-"+member.MemberId+"');\">Save</button>"+
+                    "</div>"+
+                "</div>"+
+                "</div>"+
+            "</div>";
+            
+            $('#groups #memberModals').append(memberDetailsEditContent);
+    }
+
+
         function displayGroupCard(groups) {
             $.each(groups, function(index, group) {
                 
@@ -315,7 +354,7 @@
                 createGroupDelateModal(group);
                 createGroupEditModal(group);  
                 createMemberListModal(group);
-                createAddMemberModal(group);
+                createAddMemberModal(group);                
             });       
         }
     </script>
@@ -472,6 +511,7 @@
               <div id="groupsRow" class="row">
 
               </div>
+              <div id="memberModals"></div>
             </div>
           </div>
       </section>
