@@ -193,7 +193,7 @@ app.get("/api/groups/:groupid/members/:memberid", function (req, res) {
 });
 
 // ADD A GROUP
-app.post("/api/groups", urlencodedParser, function (req, res) {
+app.post("/api/addgroups", urlencodedParser, function (req, res) {
     console.log("Received a POST request to add a group");
     console.log("BODY -------->" + JSON.stringify(req.body));
 
@@ -206,6 +206,8 @@ app.post("/api/groups", urlencodedParser, function (req, res) {
         SponsorPhone: req.body.SponsorPhone,
         SponsorEmail: req.body.SponsorEmail,
         MaxGroupSize: Number(req.body.MaxGroupSize),
+        Image: req.body.Image,
+        Description: req.body.Description,
         Members: []
     };
 

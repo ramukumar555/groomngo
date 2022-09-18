@@ -12,8 +12,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
-        $(document).ready(function(){
-            var organizations = null;
+        var organizations = null;
+        var grouptemplate = [ "GroupName", "OrganizationName","SponsorName", "SponsorPhone", "SponsorEmail","MaxGroupSize","Image","Description"];
+        $(document).ready(function(){            
             $.getJSON("/api/organizations", function(result, status){
               organizations = result;
                 $.each(organizations, function(index, organization) {
@@ -22,6 +23,8 @@
             });
 
             $('#events').append("<a id=\"viewAllEvent\" class=\"dropdown-item\" >View All</a>");
+
+            createAddGroupModal();
             
             $(document).on('click', '#events a', function() {
                 console.log(this.id);
@@ -39,6 +42,42 @@
             });  
         });
 
+        function createAddGroupModal(){
+            //Model to Add Group 
+            var goupDetailsAddContent = "<div class=\"modal fade\" id=\"addGroup\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"addGroupLabel\" aria-hidden=\"true\">"+
+                "<div class=\"modal-dialog\" role=\"document\">"+
+                  "<div class=\"modal-content\">"+
+                    "<div class=\"modal-header\">"+
+                      "<h5 class=\"modal-title\" id=\"addGroupLabel\">Add a new Group</h5>"+
+                      "<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\">"+
+                        "<span aria-hidden=\"true\">&times;</span>"+
+                      "</button>"+
+                    "</div>"+
+                    "<div class=\"modal-body\"><form id=\"addGroupForm\" class=\form-group container\">";
+            $.each(grouptemplate, function(key,value){
+                if(key !== "Members"   ){
+                    goupDetailsAddContent  = goupDetailsAddContent+ "<div class=\"form-group row\">"+
+                    "<label for=\"staticEmail\" class=\"col-sm col-form-label\">"+value+"</label>"+                        
+                    "<div class=\"col-sm\">"+
+                      "<input type=\"text\" class=\"form-control\" id=\""+value+"\" name=\""+value+"\">"+
+                    "</div>"+
+                  "</div>";
+                    }
+            });                            
+            let url = "/api/addgroups";
+            goupDetailsAddContent  = goupDetailsAddContent+ "</form></div>"+
+                    "<div class=\"modal-footer\">"+
+                      "<button type=\"button\" class=\"btn btn-secondary \" data-dismiss=\"modal\">Close</button>"+
+                      "<button type=\"button\" class=\"btn btn-primary\" onClick=\"sendReqToServer('"+url+"','POST','#addGroupForm');\">Save</button>"+
+                    "</div>"+
+                  "</div>"+
+                "</div>"+
+              "</div>";
+
+              $(goupDetailsAddContent).insertAfter("#addGroupButton");
+            
+            
+        }
         function sendReqToServer(url,type,formID){
             let form = $(formID);
             let isaaray = Array.isArray(form);
@@ -153,7 +192,7 @@
                         goupDetailsEditContent  = goupDetailsEditContent+ "<div class=\"form-group row\">"+
                         "<label for=\"staticEmail\" class=\"col-sm col-form-label\">"+key+"</label>"+                        
                         "<div class=\"col-sm\">"+
-                          "<input type=\"text\" class=\"form-control-plaintext\" id=\""+key+"\" name=\""+key+"\" value=\""+value+"\">"+
+                          "<input type=\"text\" class=\"form-control\" id=\""+key+"\" name=\""+key+"\" value=\""+value+"\">"+
                         "</div>"+
                       "</div>";
                         }
@@ -323,6 +362,9 @@
                     
                 </div>
             </div>
+            <p></p>
+            <p></p>
+            <button type="button" id="addGroupButton" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#addGroup" data-groupid="1">Add a Group</button>
           </p>
         </div>
         <div id="groups" class="album py-5 bg-light">
