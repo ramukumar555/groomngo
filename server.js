@@ -247,10 +247,11 @@ app.put("/api/groups/:id", urlencodedParser, function (req, res) {
         SponsorPhone: req.body.SponsorPhone,
         SponsorEmail: req.body.SponsorEmail,
         MaxGroupSize: Number(req.body.MaxGroupSize),
+        Image: req.body.Image,
+        Description: req.body.Description,
     };
 
-    console.log("Group -------->" + JSON.stringify(group));
-
+    
     console.log("Performing validation...");
     let errorCode = isValidGroup(group);
     if (errorCode != -1) {
@@ -262,7 +263,7 @@ app.put("/api/groups/:id", urlencodedParser, function (req, res) {
     let data = fs.readFileSync(__dirname + "/data/groups.json", "utf8");
     data = JSON.parse(data);
 
-    console.log(JSON.stringify(data));
+    
     // find the group
     let match = data.find(element => element.GroupId == group.GroupId);
     if (!match) {
@@ -277,6 +278,8 @@ app.put("/api/groups/:id", urlencodedParser, function (req, res) {
     match.SponsorName = group.SponsorName;
     match.SponsorPhone = group.SponsorPhone;
     match.SponsorEmail = group.SponsorEmail;
+    match.Image = group.Image;
+    match.Description = group.Description;
 
     // make sure new values for MaxGroupSize doesn't invalidate grooup
     if (Number(group.MaxGroupSize) < match.Members.length) {
