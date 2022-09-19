@@ -1,5 +1,11 @@
 [
     {
+        "id": 0,
+        "name": "Administrator",
+        "username": "admin",
+        "password": "admin"
+    },
+    {
         "id": 1,
         "name": "Ian Auston",
         "username": "gamer04",

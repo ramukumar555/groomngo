@@ -8,14 +8,19 @@
     <title>SELECT A DEMO | Impact By Distinctive Themes</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
     <link rel="stylesheet" href="/stylesheets/style.css">
+    <link rel="stylesheet" href="/stylesheets/login.css">
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
         var organizations = null;
         var groupTemplate = [ "GroupName", "OrganizationName","SponsorName", "SponsorPhone", "SponsorEmail","MaxGroupSize","Image","Description"];
-        var MemberTemplate = ["MemberEmail","MemberName","MemberPhone"]
-        $(document).ready(function(){            
+        var MemberTemplate = ["MemberEmail","MemberName","MemberPhone"];
+        var loginstatus = "failed";
+        var isloggedin = false;
+        var isAdmin = false;
+        $(document).ready(function(){    
+            handleLogin();        
             $.getJSON("/api/organizations", function(result, status){
               organizations = result;
                 $.each(organizations, function(index, organization) {
@@ -41,7 +46,42 @@
                         });
                 } 
             });  
+            $('#userLogin').on('submit', function(e){
+                    e.preventDefault();
+                    sendReqToServer("/api/login","POST","#userLogin");
+                    console.log("Test");
+              });
+            $('#logout').on('click', function(e){
+                e.preventDefault();
+                localStorage.removeItem("login");
+                localStorage.removeItem("loggedInTime");
+                localStorage.removeItem("user");
+                localStorage.removeItem("isAdmin");
+                window.location = "index.html";
+            });
         });
+
+        function handleLogin(){
+            loginstatus = localStorage.getItem("login");
+            if(loginstatus === "sucess"){    
+                isloggedin = true;                
+                $('#loginbutton').addClass( 'd-none' );
+                $('#profile').addClass( 'd-block' );
+                var user = JSON.parse(localStorage.getItem('user'));
+                $('#profileName').text("Welcome "+ user.username);
+                isAdmin = localStorage.getItem('isAdmin') == "true"? true: false;
+
+                $('#loginbutton').removeClass( 'd-block' );
+                $('#profile').removeClass( 'd-none' );
+            } else if(loginstatus === "failed"){      
+                isloggedin = false;         
+                $('#profile').addClass( 'd-none' );
+                $('#loginbutton').addClass( 'd-block' );
+
+                $('#profile').removeClass( 'd-block' );
+                $('#loginbutton').removeClass( 'd-none' );
+            }
+        }
 
         function createAddGroupModal(){
             //Model to Add Group 
@@ -81,6 +121,7 @@
         }
 
         function createAddMemberModal(group){
+        
             //Model to Add Group 
             var goupDetailsAddContent = "<div class=\"modal fade\" id=\"addMemberToGroup"+group.GroupId+"\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"addMemberToGroupLabel\" aria-hidden=\"true\">"+
                 "<div class=\"modal-dialog\" role=\"document\">"+
@@ -128,10 +169,28 @@
                     data: data
                 })    
             .done(function (result) {                
+                console.log(result);
+                if(url ==="/api/login"){
+                    localStorage.setItem("login", "sucess");
+                    localStorage.setItem("loggedInTime",new Date($.now()));
+                    var user = JSON.parse(result);
+                    if(user.username === "admin"){
+                        localStorage.setItem("isAdmin",true);
+                    }else{
+                        localStorage.setItem("isAdmin",false);
+                    }
+                    localStorage.setItem("user", result);
+                }
                 window.location = "index.html";
             })
             .fail(function (result){
                 console.log(result);
+                if(url ==="/api/login"){
+                    localStorage.setItem("login", "failed");
+                    localStorage.removeItem("loggedInTime");
+                    localStorage.removeItem("user");
+                    localStorage.removeItem("isAdmin");
+                }
             });
         }
 
@@ -143,9 +202,12 @@
                     "<p class=\"card-text\">"+group.Description+"</p>"+
                     "<div class=\"d-flex justify-content-between align-items-center\">"+
                     "<div class=\"btn-group btn-group-justified w-100\">"+
-                        "<button type=\"button\" class=\"btn btn-sm btn-primary\" data-toggle=\"modal\" data-target=\"#groupDetails"+group.GroupId+"\" data-groupid='"+group.GroupId+"'>Details</button>"+
-                        "<button type=\"button\" class=\"btn btn-sm btn-primary\" data-toggle=\"modal\" data-target=\"#addMemberToGroup"+group.GroupId+"\" data-groupid='"+group.GroupId+"'>Add Me</button>"+
-                        "<button type=\"button\" class=\"btn btn-sm btn-primary\" data-toggle=\"modal\" data-target=\"#groupMemberList"+group.GroupId+"\" data-groupid='"+group.GroupId+"'>Members List</button>"+
+                        "<button type=\"button\" class=\"btn btn-sm btn-primary\" data-toggle=\"modal\" data-target=\"#groupDetails"+group.GroupId+"\" data-groupid='"+group.GroupId+"'>Details</button>";
+                if(isloggedin){
+                    cardDetail = cardDetail + "<button type=\"button\" class=\"btn btn-sm btn-primary\" data-toggle=\"modal\" data-target=\"#addMemberToGroup"+group.GroupId+"\" data-groupid='"+group.GroupId+"'>Add Me</button>";
+                }
+                        
+                cardDetail = cardDetail + "<button type=\"button\" class=\"btn btn-sm btn-primary\" data-toggle=\"modal\" data-target=\"#groupMemberList"+group.GroupId+"\" data-groupid='"+group.GroupId+"'>Members List</button>"+
                     "</div>"+
                     "</div>"+
                 "</div>"+
@@ -175,14 +237,16 @@
                     }
             });                            
 
-            goupDetailsContent  = goupDetailsContent+ "</div>"+
-                    "<div class=\"modal-footer\">"+                          
-                      "<button type=\"button\" class=\"btn btn-primary\" data-toggle=\"modal\" data-target=\"#groupDetailsEdit"+group.GroupId+"\" data-groupid='"+group.GroupId+"'>Edit</button>"+
-                      "<button type=\"button\" class=\"btn btn-danger\" data-toggle=\"modal\" data-target=\"#groupDetailsDelete"+group.GroupId+"\" data-groupid='"+group.GroupId+"'>Delete</button>"+                          
+            if(isloggedin && isAdmin){
+                goupDetailsContent  = goupDetailsContent+ "</div>"+
+                        "<div class=\"modal-footer\">"+                          
+                        "<button type=\"button\" class=\"btn btn-primary\" data-toggle=\"modal\" data-target=\"#groupDetailsEdit"+group.GroupId+"\" data-groupid='"+group.GroupId+"'>Edit</button>"+
+                        "<button type=\"button\" class=\"btn btn-danger\" data-toggle=\"modal\" data-target=\"#groupDetailsDelete"+group.GroupId+"\" data-groupid='"+group.GroupId+"'>Delete</button>"+                          
+                        "</div>"+
                     "</div>"+
-                  "</div>"+
-                "</div>"+
-              "</div>";
+                    "</div>"+
+                "</div>";
+            }
             
             $('#groups #groupsRow').append(goupDetailsContent);
         }
@@ -269,9 +333,12 @@
                                     "<th scope=\"col\">MemberId</th>"+
                                     "<th scope=\col\">MemberEmail</th>"+
                                     "<th scope=\"col\">MemberName</th>"+
-                                    "<th scope=\"col\">MemberPhone</th>"+
-                                    "<th scope=\"col\">#</th>"+
-                                "</tr>"+
+                                    "<th scope=\"col\">MemberPhone</th>";
+            if(isloggedin && isAdmin)
+            {
+                memberalistContent  = memberalistContent+ "<th scope=\"col\">#</th>";
+            }                
+            memberalistContent  = memberalistContent+ "</tr>"+
                               "</thead>"+
                               "<tbody>";
                                             
@@ -282,10 +349,13 @@
                                         "<th scope=\"row\">"+member.MemberId+"</th>"+
                                         "<td>"+member.MemberEmail+"</td>"+
                                         "<td>"+member.MemberName+"</td>"+
-                                        "<td>"+member.MemberPhone+"</td>"+
-                                        "<td>"+
-                                            "<a class=\"link-primary\" data-toggle=\"modal\" data-target=\"#memberDetailsEdit-"+group.GroupId+"-"+member.MemberId+"\">Edit</a>  ||  <a class=\"link-danger\"  onClick=\"sendReqToServer('"+url+"','DELETE',null);\">Delete</a></td>"+
-                                    "</tr>";
+                                        "<td>"+member.MemberPhone+"</td>";
+                    if(isloggedin && isAdmin)
+                    {
+                        memberalistContent  = memberalistContent + "<td>"+
+                                            "<a class=\"link-primary\" data-toggle=\"modal\" data-target=\"#memberDetailsEdit-"+group.GroupId+"-"+member.MemberId+"\">Edit</a>  ||  <a class=\"link-danger\"  onClick=\"sendReqToServer('"+url+"','DELETE',null);\">Delete</a></td>";
+                    }
+                    memberalistContent  = memberalistContent + "</tr>";
                     createEditMemberModal(group,member);
                 });
             } else {
@@ -351,12 +421,30 @@
                 
                 createCards(group);
                 createGroupDetailsModal(group);
-                createGroupDelateModal(group);
-                createGroupEditModal(group);  
+                if(isloggedin){
+                    if(isAdmin){
+                        createGroupDelateModal(group);
+                        createGroupEditModal(group);  
+                    }
+                    createAddMemberModal(group);   
+                }             
                 createMemberListModal(group);
-                createAddMemberModal(group);                
             });       
         }
+    
+        function enableLoginPage(){
+            $('.top-content').removeClass( 'd-block' );
+            $('#search').removeClass( 'd-block' );
+            $('.login').removeClass( 'd-none' );
+            
+
+            $('.top-content').addClass( 'd-none' );
+            $('#search').addClass( 'd-none' );
+            $('.login').addClass( 'd-block' );
+
+
+        }
+
     </script>
 
 </head><!--/head-->
@@ -377,27 +465,55 @@
                 <li class="nav-item">
                     <a class="nav-link" href="#search">Search</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Link</a>
+                <li class="nav-item" id="loginbutton" class="d-block">
+                    <a class="nav-link" onclick="enableLoginPage();">Login</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">Link</a>
                 </li> 
                 <!-- Dropdown -->
-                <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
-                    Dropdown link
+                <li class="nav-item dropdown" id="profile" class="d-none">
+                <a class="nav-link dropdown-toggle" id="profileName" data-toggle="dropdown">
+                    
                 </a>
                 <div class="dropdown-menu">
-                    <a class="dropdown-item" href="#">Link 1</a>
-                    <a class="dropdown-item" href="#">Link 2</a>
-                    <a class="dropdown-item" href="#">Link 3</a>
+                    <a class="dropdown-item" id="logout" >Logout</a>
                 </div>
                 </li>
                 </ul>
             </div>
         </div>
     </nav>
+
+    <div class="login d-none">
+        <div class="pt-5">  
+            <div class="global-container">  
+              <div class="card login-form">  
+              <div class="card-body">  
+                  <h3 class="card-title text-center"> Login Form </h3>  
+                  <div class="card-text">  
+                      <form id="userLogin">  
+                          <div class="form-group">  
+                              <label for="username"> Enter User Name </label>  
+                              <input type="text" class="form-control form-control-sm" id="username" name="username" aria-describedby="usernameHelp">  
+                          </div>  
+                          <div class="form-group">  
+                              <label for="password">Enter Password </label>  
+                              <a href="#" style="float:right;font-size:12px;"> Forgot password? </a>  
+                              <input type="password" class="form-control form-control-sm" id="password" name="password">  
+                          </div>  
+                          <button type="submit" class="btn btn-primary btn-block" > Sign in </button>  
+                            
+                          <div class="sign-up">  
+                              Don't have an account? <a href="#"> Create One </a>  
+                          </div>  
+                      </form>  
+                  </div>  
+              </div>  
+          </div>  
+          </div>  
+    </div>
+    </div>
     <!-- Top content -->
     <div class="top-content">
         <!-- Carousel -->
@@ -515,5 +631,6 @@
             </div>
           </div>
       </section>
+    
 </body>
 </html>
