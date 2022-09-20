@@ -16,11 +16,13 @@
         var organizations = null;
         var groupTemplate = [ "GroupName", "OrganizationName","SponsorName", "SponsorPhone", "SponsorEmail","MaxGroupSize","Image","Description"];
         var MemberTemplate = ["MemberEmail","MemberName","MemberPhone"];
+        var userTemplate = ["name","username","password"]
         var loginstatus = "failed";
         var isloggedin = false;
         var isAdmin = false;
         $(document).ready(function(){    
-            handleLogin();        
+            handleLogin();    
+            createSignup();    
             $.getJSON("/api/organizations", function(result, status){
               organizations = result;
                 $.each(organizations, function(index, organization) {
@@ -88,6 +90,39 @@
             }
         }
 
+        function createSignup(){
+            //Model to Add Group 
+            var userSignupContent = "<div class=\"modal fade\" id=\"userSignup\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"userSignupLabel\" aria-hidden=\"true\">"+
+                "<div class=\"modal-dialog\" role=\"document\">"+
+                  "<div class=\"modal-content\">"+
+                    "<div class=\"modal-header\">"+
+                      "<h5 class=\"modal-title\" id=\"userSignupLabel\">Add a new Group</h5>"+
+                      "<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\">"+
+                        "<span aria-hidden=\"true\">&times;</span>"+
+                      "</button>"+
+                    "</div>"+
+                    "<div class=\"modal-body\"><form id=\"userSignupForm\" class=\form-group container\">";
+            $.each(userTemplate, function(key,value){
+                    userSignupContent  = userSignupContent+ "<div class=\"form-group row\">"+
+                    "<label for=\"staticEmail\" class=\"col-sm col-form-label\">"+value+"</label>"+                        
+                    "<div class=\"col-sm\">"+
+                      "<input type=\"text\" class=\"form-control\" id=\""+value+"\" name=\""+value+"\">"+
+                    "</div>"+
+                  "</div>";
+            });                            
+            let url = "/api/users";
+            userSignupContent  = userSignupContent+ "</form></div>"+
+                    "<div class=\"modal-footer\">"+
+                      "<button type=\"button\" class=\"btn btn-secondary \" data-dismiss=\"modal\">Close</button>"+
+                      "<button type=\"button\" class=\"btn btn-primary\" onClick=\"sendReqToServer('"+url+"','POST','#userSignupForm');\">Save</button>"+
+                    "</div>"+
+                  "</div>"+
+                "</div>"+
+              "</div>";
+
+              $('.sign-up').append(userSignupContent);   
+        }
+
         function createAddGroupModal(){
             //Model to Add Group 
             var goupDetailsAddContent = "<div class=\"modal fade\" id=\"addGroup\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"addGroupLabel\" aria-hidden=\"true\">"+
@@ -120,10 +155,7 @@
                 "</div>"+
               "</div>";
 
-              $('#addGroupButtonPlaceholder').append(goupDetailsAddContent);
-              
-            
-            
+              $('#addGroupButtonPlaceholder').append(goupDetailsAddContent);   
         }
 
         function createAddMemberModal(group){
@@ -545,7 +577,7 @@
                           <button type="submit" class="btn btn-primary btn-block" > Sign in </button>  
                             
                           <div class="sign-up">  
-                              Don't have an account? <a href="#"> Create One </a>  
+                              Don't have an account? <a class="link-primary" data-toggle="modal" data-target="#userSignup"> Create One </a>  
                           </div>  
                       </form>  
                   </div>  
